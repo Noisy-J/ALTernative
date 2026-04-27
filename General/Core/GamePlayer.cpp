@@ -27,8 +27,8 @@ bool GamePlayer::initialize() {
 
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
     m_Window.create(sf::VideoMode({ 1280, 720 }),
-        "ALTernative Player - " + m_StartScene,
-        sf::Style::Default);
+        "ALTernative Player - " + m_StartScene/*,
+        sf::Style::Default*/);
     m_Window.setFramerateLimit(60);
 
     m_Viewport = std::make_unique<Viewport>(1280, 720);
