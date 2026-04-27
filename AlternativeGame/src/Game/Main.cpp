@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
         projectPath = ".";
     }
 
-    std::cout << "=== LiteGame Player v1.0 ===" << std::endl;
+    std::cout << "=== AlternativeGame Player v1.1 ===" << std::endl;
     std::cout << "Project: " << projectPath << std::endl;
 
     try {
