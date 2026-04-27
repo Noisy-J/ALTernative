@@ -1,8 +1,10 @@
 #include "RenderSystem.hpp"
 #include <algorithm>
 #include <vector>
+#include <iostream>
 
 void RenderSystem::drawSprites(Scene& scene, sf::RenderTarget& target) {
+
     // Собираем спрайты для сортировки по слоям
     std::vector<std::pair<int, sf::Sprite*>> spritesToDraw;
 

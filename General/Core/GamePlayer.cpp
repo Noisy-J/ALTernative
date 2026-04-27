@@ -17,6 +17,9 @@ GamePlayer::~GamePlayer() {
 }
 
 bool GamePlayer::initialize() {
+    // Определяем базовый путь (папка с .exe)
+    ResourceManager::setBasePath(m_ProjectPath);
+
     if (!loadProjectConfig()) {
         std::cerr << "[Player] Failed to load project config" << std::endl;
         return false;
@@ -32,7 +35,7 @@ bool GamePlayer::initialize() {
     sf::View view = m_Viewport->getView();
     auto size = m_Viewport->getSize();
     view.setCenter({ static_cast<float>(size.x) / 2.f, static_cast<float>(size.y) / 2.f });
-    view.setSize({ static_cast<float>(size.x), -static_cast<float>(size.y) });
+    view.setSize({ static_cast<float>(size.x), static_cast<float>(size.y) });
     m_Viewport->setView(view);
 
     m_Serializer = std::make_unique<SceneSerializer>(m_Scene);
