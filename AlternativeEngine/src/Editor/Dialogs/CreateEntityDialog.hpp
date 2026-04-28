@@ -17,7 +17,6 @@ public:
     void render();
     bool isOpen() const { return m_IsOpen; }
 
-    // Callback при создании сущности
     void setOnEntityCreated(std::function<void(Entity)> callback) { m_OnEntityCreated = callback; }
 
 private:
@@ -25,17 +24,14 @@ private:
     bool m_IsOpen{ false };
     sf::Vector2f m_WorldPosition{ 0.f, 0.f };
 
-    // Настройки сущности
     char m_EntityName[64] = "New Entity";
 
-    // Компоненты для добавления
     bool m_AddSprite{ false };
     bool m_AddVelocity{ false };
     bool m_AddCollider{ false };
     bool m_AddHealth{ false };
     bool m_AddTag{ false };
 
-    // Настройки компонентов
     // Sprite
     std::string m_SelectedTexturePath;
     sf::Color m_SpriteColor{ sf::Color::White };
@@ -46,8 +42,7 @@ private:
     float m_MaxSpeed{ 1000.f };
     float m_Damping{ 0.f };
 
-    // Collider
-    ColliderComponent::Shape m_ColliderShape{ ColliderComponent::Shape::Box };
+    // Collider — обновлено под новую структуру
     sf::Vector2f m_BoxSize{ 32.f, 32.f };
     float m_CircleRadius{ 16.f };
     sf::Vector2f m_ColliderOffset{ 0.f, 0.f };
@@ -61,15 +56,12 @@ private:
     // Tag
     char m_TagName[32] = "Untagged";
 
-    // UI состояние
-    int m_CurrentStep{ 0 }; // 0: Basic, 1: Components, 2: Component Settings
+    int m_CurrentStep{ 0 };
     std::vector<std::string> m_AvailableTextures;
     int m_SelectedTextureIndex{ -1 };
 
-    // Callback
     std::function<void(Entity)> m_OnEntityCreated;
 
-    // Методы
     void renderBasicInfo();
     void renderComponentSelection();
     void renderComponentSettings();
@@ -81,9 +73,7 @@ private:
 
     void createEntity();
     void scanTextures();
-    //void loadTexturePreview();
 
-    // Вспомогательные методы
     const char* getStepName(int step) const;
     bool canProceed() const;
 };

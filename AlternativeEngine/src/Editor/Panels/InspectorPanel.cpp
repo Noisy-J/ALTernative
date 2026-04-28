@@ -14,7 +14,6 @@ void InspectorPanel::render(Entity entity) {
     ImGui::Text("Entity ID: %d", entity);
     ImGui::SameLine();
 
-    // Поле имени
     std::string currentName = m_Scene.getEntityName(entity);
     strcpy_s(m_EntityNameBuffer, currentName.c_str());
     ImGui::SetNextItemWidth(-1);
@@ -26,6 +25,7 @@ void InspectorPanel::render(Entity entity) {
 
     renderTransform(entity);
     renderSprite(entity);
+    renderCollider(entity);
     renderVelocity(entity);
 
     ImGui::Spacing();
@@ -139,6 +139,7 @@ void InspectorPanel::renderSprite(Entity entity) {
     }
 }
 
+// Обновленный renderAddComponentMenu
 void InspectorPanel::renderAddComponentMenu(Entity entity) {
     ImGui::Text("Add Component");
 
@@ -160,6 +161,14 @@ void InspectorPanel::renderAddComponentMenu(Entity entity) {
         if (!m_Scene.colliders.contains(entity)) {
             if (ImGui::Selectable("Collider")) {
                 m_Scene.colliders[entity] = ColliderComponent{};
+                // Копируем размер из спрайта если есть
+                if (m_Scene.sprites.contains(entity) && m_Scene.sprites[entity].texture) {
+                    auto texSize = m_Scene.sprites[entity].texture->getSize();
+                    m_Scene.colliders[entity].ColliderSize = {
+                        static_cast<float>(texSize.x),
+                        static_cast<float>(texSize.y)
+                    };
+                }
             }
         }
 
@@ -191,7 +200,6 @@ void InspectorPanel::renderAddComponentMenu(Entity entity) {
         }
     }
 }
-
 void InspectorPanel::renderVelocity(Entity entity) {
     auto velIt = m_Scene.velocities.find(entity);
 
@@ -212,12 +220,83 @@ void InspectorPanel::renderVelocity(Entity entity) {
             }
         }
     }
-    else {
-        if (ImGui::CollapsingHeader("Velocity", ImGuiTreeNodeFlags_DefaultOpen)) {
-            ImGui::Text("No velocity component");
-            if (ImGui::Button("Add Velocity")) {
-                m_Scene.velocities[entity] = VelocityComponent{};
+}
+
+// НОВАЯ ФУНКЦИЯ
+void InspectorPanel::renderCollider(Entity entity) {
+    auto colIt = m_Scene.colliders.find(entity);
+
+    if (colIt != m_Scene.colliders.end()) {
+        ImGui::PushID("ColliderComponent");
+
+        if (ImGui::CollapsingHeader("Collider", ImGuiTreeNodeFlags_DefaultOpen)) {
+            auto& col = colIt->second;
+
+            // Позиция хитбокса (смещение)
+            float colPos[2] = { col.ColliderPosition.x, col.ColliderPosition.y };
+            if (ImGui::DragFloat2("Offset", colPos, 1.f)) {
+                col.ColliderPosition = { colPos[0], colPos[1] };
+            }
+            ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.f), "Offset from entity position");
+
+            ImGui::Separator();
+
+            // Размер хитбокса
+            float colSize[2] = { col.ColliderSize.x, col.ColliderSize.y };
+            if (ImGui::DragFloat2("Size", colSize, 1.f, 1.f, 10000.f)) {
+                col.ColliderSize = { colSize[0], colSize[1] };
+            }
+
+            // Радиус (для круглых хитбоксов)
+            ImGui::DragFloat("Radius", &col.ColliderRadius, 1.f, 0.f, 10000.f);
+            ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.f), "Used for circle collisions");
+
+            ImGui::Separator();
+
+            // Поворот
+            float rot = col.ColliderRotation.asDegrees();
+            if (ImGui::DragFloat("Rotation", &rot, 1.f, -360.f, 360.f)) {
+                col.ColliderRotation = sf::degrees(rot);
+            }
+
+            ImGui::Separator();
+
+            // Настройки
+            ImGui::Checkbox("Is Trigger", &col.isTrigger);
+            ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.f),
+                "Trigger doesn't block movement");
+
+            ImGui::Checkbox("Is Static", &col.isStatic);
+            ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.f),
+                "Static colliders don't move");
+
+            ImGui::Separator();
+
+            // Отладка
+            ImGui::Checkbox("Show Debug", &col.drawDebug);
+            if (col.drawDebug) {
+                float debugCol[3] = {
+                    static_cast<float>(col.debugColor.r) / 255.f,
+                    static_cast<float>(col.debugColor.g) / 255.f,
+                    static_cast<float>(col.debugColor.b) / 255.f
+                };
+                if (ImGui::ColorEdit3("Debug Color", debugCol)) {
+                    col.debugColor = sf::Color(
+                        static_cast<uint8_t>(debugCol[0] * 255),
+                        static_cast<uint8_t>(debugCol[1] * 255),
+                        static_cast<uint8_t>(debugCol[2] * 255)
+                    );
+                }
+            }
+
+            ImGui::Separator();
+
+            if (ImGui::Button("Remove Collider", ImVec2(-1, 0))) {
+                m_Scene.colliders.erase(entity);
             }
         }
+
+        ImGui::PopID();
     }
 }
+

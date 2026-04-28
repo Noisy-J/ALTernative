@@ -5,7 +5,7 @@
 #include <string>
 #include <functional>
 
-class EditorUI; // Forward declaration
+class EditorUI;
 
 class InspectorPanel {
 public:
@@ -27,5 +27,6 @@ private:
     void renderTransform(Entity entity);
     void renderSprite(Entity entity);
     void renderVelocity(Entity entity);
+    void renderCollider(Entity entity);
     void renderAddComponentMenu(Entity entity);
 };

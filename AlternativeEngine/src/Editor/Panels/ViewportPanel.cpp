@@ -1,11 +1,12 @@
 #include "ViewportPanel.hpp"
+#include "ECS/Scene.hpp"  // Добавляем для drawDebug
 #include <imgui-SFML.h>
 
 ViewportPanel::ViewportPanel(Viewport& viewport)
     : m_Viewport(viewport) {
 }
 
-void ViewportPanel::render() {
+void ViewportPanel::render(Scene& scene) {  // Принимает scene
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
     ImGui::Begin("Viewport");
 
@@ -23,13 +24,16 @@ void ViewportPanel::render() {
         static_cast<float>(m_Viewport.getSize().y));
     ImGui::Image(m_Viewport.getTexture(), size);
 
+    // Отрисовка коллайдеров если включено
+    if (m_ShowColliders) {
+        renderColliders(scene);
+    }
+
     // Отслеживаем вход/выход мыши из Viewport
     if (ImGui::IsItemHovered()) {
         if (!m_Viewport.isMouseInside()) {
-            // Мышь только что вошла
             m_Viewport.setMouseInside(true);
         }
-        // Меняем курсор в зависимости от режима
         switch (m_Viewport.getMouseMode()) {
         case Viewport::MouseMode::Select:
             ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
@@ -44,7 +48,6 @@ void ViewportPanel::render() {
     }
     else {
         if (m_Viewport.isMouseInside()) {
-            // Мышь только что вышла
             m_Viewport.setMouseInside(false);
         }
     }
@@ -92,7 +95,9 @@ void ViewportPanel::renderToolbar() {
     ImGui::TextColored(ImVec4(0.3f, 0.3f, 0.3f, 1.0f), "|");
     ImGui::SameLine();
 
-    // Кнопка Debug - открываем попап
+    // Кнопка Colliders
+
+    // Кнопка Debug
     if (ImGui::Button("Debug")) {
         m_ShowDebugPopup = true;
     }
@@ -105,13 +110,12 @@ void ViewportPanel::renderToolbar() {
 
     ImGui::EndChild();
 
-    // Рендерим попап здесь, после тулбара но до конца окна Viewport
+    // Попап настроек отладки
     if (m_ShowDebugPopup) {
         ImGui::OpenPopup("ViewportSettings");
         m_ShowDebugPopup = false;
     }
 
-    // Всегда проверяем попап
     if (ImGui::BeginPopup("ViewportSettings")) {
         ImGui::Text("Viewport Display Settings");
         ImGui::Separator();
@@ -125,9 +129,6 @@ void ViewportPanel::renderToolbar() {
         }
         if (boundsChanged) {
             m_Viewport.setShowBounds(m_ShowBounds);
-        }
-        if (collidersChanged) {
-            m_Viewport.setShowColliders(m_ShowColliders);
         }
 
         ImGui::Separator();
@@ -150,6 +151,38 @@ void ViewportPanel::renderToolbar() {
 
         ImGui::EndPopup();
     }
+}
+
+void ViewportPanel::renderColliders(Scene& scene) {
+    sf::RenderTexture& rt = m_Viewport.getRenderTexture();
+    sf::View oldView = rt.getView();
+    rt.setView(m_Viewport.getView());
+
+    for (auto& [entity, collider] : scene.colliders) {
+        if (!collider.drawDebug) continue;
+        if (!scene.isValid(entity)) continue;
+
+        auto& transform = scene.transforms.at(entity);
+
+        // Box
+        sf::RectangleShape rect(collider.ColliderSize);
+        rect.setOrigin(collider.ColliderSize / 2.0f);
+        rect.setPosition(transform.Pos + collider.ColliderPosition);
+        rect.setRotation(collider.ColliderRotation);
+        rect.setFillColor(sf::Color::Transparent);
+        rect.setOutlineColor(collider.debugColor);
+        rect.setOutlineThickness(2.0f);
+        rt.draw(rect);
+
+        // Center point
+        sf::CircleShape centerPoint(3.0f);
+        centerPoint.setOrigin({ 3.0f, 3.0f });
+        centerPoint.setPosition(transform.Pos + collider.ColliderPosition);
+        centerPoint.setFillColor(sf::Color::Red);
+        rt.draw(centerPoint);
+    }
+
+    rt.setView(oldView);
 }
 
 void ViewportPanel::handleResize() {

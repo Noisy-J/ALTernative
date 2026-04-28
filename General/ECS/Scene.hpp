@@ -35,6 +35,16 @@ public:
     void setVelocity(Entity entity, const sf::Vector2f& velocity);
     sf::Vector2f getVelocity(Entity entity) const;
 
+    //Collider
+    void setColliderPosition(Entity entity, const sf::Vector2f& pos);
+    void setColliderSize(Entity entity, const sf::Vector2f& size);
+    void setColliderRotation(Entity entity, sf::Angle rot);
+    void setColliderRadius(Entity entity, float rad);
+    sf::Vector2f getColliderPosition(Entity entity)  const;
+    sf::Vector2f getColliderSize(Entity entity)  const;
+    float getColliderRotation(Entity entity)  const;
+    float getColliderRadius(Entity entity)  const;
+
     // Иерархия
     void setParent(Entity child, Entity parent);
     void removeParent(Entity child);
@@ -47,19 +57,17 @@ public:
     std::string getEntityName(Entity entity) const;
 
     // Контейнеры компонентов
+    // Существующие мапы компонентов
     std::unordered_map<Entity, TransformComponent> transforms;
     std::unordered_map<Entity, SpriteComponent> sprites;
     std::unordered_map<Entity, VelocityComponent> velocities;
-    std::unordered_map<Entity, TagComponent> tags;
-    std::unordered_map<Entity, HealthComponent> healths;
     std::unordered_map<Entity, ColliderComponent> colliders;
-    std::unordered_map<Entity, ScriptComponent> scripts;
-
-    // Иерархия и имена
     std::unordered_map<Entity, NameComponent> names;
     std::unordered_map<Entity, ParentComponent> parents;
     std::unordered_map<Entity, ChildrenComponent> children;
-    std::unordered_map<Entity, VisibilityComponent> visibility;
+    std::unordered_map<Entity, TagComponent> tags;
+    std::unordered_map<Entity, HealthComponent> healths;
+    std::unordered_map<Entity, ScriptComponent> scripts;
 
     // Имя сцены
     std::string sceneName = "Untitled Scene";

@@ -26,7 +26,6 @@ void CreateEntityDialog::open(const sf::Vector2f& worldPosition) {
     m_InitialVelocity = { 0.f, 0.f };
     m_MaxSpeed = 1000.f;
     m_Damping = 0.f;
-    m_ColliderShape = ColliderComponent::Shape::Box;
     m_BoxSize = { 32.f, 32.f };
     m_CircleRadius = 16.f;
     m_ColliderOffset = { 0.f, 0.f };
@@ -236,22 +235,15 @@ void CreateEntityDialog::renderVelocitySettings() {
 }
 
 void CreateEntityDialog::renderColliderSettings() {
-    const char* shapes[] = { "Box", "Circle" };
-    int currentShape = static_cast<int>(m_ColliderShape);
+    // Убрано: ColliderComponent::Shape — больше не существует
+    // Вместо этого просто настройки размера
 
-    if (ImGui::Combo("Shape", &currentShape, shapes, 2)) {
-        m_ColliderShape = static_cast<ColliderComponent::Shape>(currentShape);
+    float size[2] = { m_BoxSize.x, m_BoxSize.y };
+    if (ImGui::DragFloat2("Size", size, 1.f, 1.f, 1000.f)) {
+        m_BoxSize = { size[0], size[1] };
     }
 
-    if (m_ColliderShape == ColliderComponent::Shape::Box) {
-        float size[2] = { m_BoxSize.x, m_BoxSize.y };
-        if (ImGui::DragFloat2("Size", size, 1.f, 1.f, 1000.f)) {
-            m_BoxSize = { size[0], size[1] };
-        }
-    }
-    else {
-        ImGui::DragFloat("Radius", &m_CircleRadius, 1.f, 1.f, 1000.f);
-    }
+    ImGui::DragFloat("Radius", &m_CircleRadius, 1.f, 1.f, 1000.f);
 
     float offset[2] = { m_ColliderOffset.x, m_ColliderOffset.y };
     if (ImGui::DragFloat2("Offset", offset, 1.f)) {
@@ -328,12 +320,12 @@ void CreateEntityDialog::createEntity() {
     // Collider
     if (m_AddCollider) {
         auto& col = m_Scene.colliders[entity];
-        col.shape = m_ColliderShape;
-        col.size = m_BoxSize;
-        col.radius = m_CircleRadius;
-        col.offset = m_ColliderOffset;
+        col.ColliderSize = m_BoxSize;
+        col.ColliderRadius = m_CircleRadius;
+        col.ColliderPosition = m_ColliderOffset;
         col.isTrigger = m_IsTrigger;
         col.isStatic = m_IsStatic;
+        col.drawDebug = true;
     }
 
     // Health

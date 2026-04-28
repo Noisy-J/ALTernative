@@ -1,0 +1,12 @@
+{
+  "version": "1.0",
+  "sceneName": "srpt_test",
+  "entities": [
+    {
+      "id": 0,
+      "name": "Sprite",
+      "transform": {"position":{"x":690.000,"y":332.000},"rotation":0.000,"scale":{"x":1.000,"y":1.000}},
+      "sprite": {"texturePath":"./assets/textures\\hero.png","layer":0.000,"visible":true}
+    }
+  ]
+}

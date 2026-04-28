@@ -10,7 +10,7 @@ add_library(AlternativeCore STATIC
     Resources/TextureBrowser.cpp
     Utils/FileUtils.cpp
     Utils/CoordinateConverter.cpp
-)
+    ECS/Systems/CollisionSystem.cpp)
 
 target_include_directories(AlternativeCore PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}

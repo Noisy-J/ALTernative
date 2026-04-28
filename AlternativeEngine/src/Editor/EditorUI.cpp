@@ -1,6 +1,7 @@
 #include "EditorUI.hpp"
 #include "Resources/ResourceManager.hpp"
 #include "Utils/CoordinateConverter.hpp"
+#include "Core/Engine.hpp"
 #include <chrono>
 #include <sstream>
 #include <iomanip>
@@ -8,10 +9,11 @@
 
 namespace fs = std::filesystem;
 
-EditorUI::EditorUI(sf::RenderWindow& window, Scene& scene, Viewport& viewport)
+EditorUI::EditorUI(sf::RenderWindow& window, Scene& scene, Viewport& viewport, Engine& engine)
     : m_Window(window)
     , m_Scene(scene)
-    , m_Viewport(viewport) {
+    , m_Viewport(viewport) 
+    , m_Engine(engine) {
 
     m_InspectorPanel = std::make_unique<InspectorPanel>(scene);
     m_DebugPanel = std::make_unique<DebugPanel>();
@@ -24,6 +26,7 @@ EditorUI::EditorUI(sf::RenderWindow& window, Scene& scene, Viewport& viewport)
     m_CreateEntityDialog = std::make_unique<CreateEntityDialog>(scene);
     m_FileDialog = std::make_unique<FileDialog>();
     m_BuildDialog = std::make_unique<BuildDialog>(scene);
+
 
     // Колбэк для FileDialog
     m_FileDialog->setOnFileSelected([this](const std::string& path) {
@@ -118,7 +121,8 @@ void EditorUI::render() {
     }
 
     // Viewport
-    m_ViewportPanel->render();
+    // Viewport теперь принимает сцену для отрисовки коллайдеров
+    m_ViewportPanel->render(m_Scene);
 
     // Script Editor
     if (m_ShowScriptEditor) {
@@ -140,6 +144,35 @@ void EditorUI::render() {
 
 void EditorUI::renderMainMenu() {
     if (ImGui::BeginMainMenuBar()) {
+        // Кнопки управления симуляцией
+        bool isPlaying = m_Engine.isPlaying();
+        bool isPaused = m_Engine.isPaused();
+
+        // Кнопка Play/Stop
+        ImVec4 playColor = isPlaying ? ImVec4(0.2f, 0.6f, 0.2f, 1.0f) : ImVec4(0.3f, 0.3f, 0.3f, 1.0f);
+        ImGui::PushStyleColor(ImGuiCol_Button, playColor);
+        if (ImGui::Button(isPlaying ? "Stop" : "Play")) {
+            if (isPlaying) m_Engine.stop();
+            else m_Engine.play();
+        }
+        ImGui::PopStyleColor();
+
+        ImGui::SameLine();
+
+        // Кнопка Pause (только когда играем)
+        if (isPlaying) {
+            ImVec4 pauseColor = isPaused ? ImVec4(0.8f, 0.6f, 0.2f, 1.0f) : ImVec4(0.3f, 0.3f, 0.3f, 1.0f);
+            ImGui::PushStyleColor(ImGuiCol_Button, pauseColor);
+            if (ImGui::Button(isPaused ? "Resume" : "Pause")) {
+                m_Engine.pause();
+            }
+            ImGui::PopStyleColor();
+        }
+
+        ImGui::SameLine();
+        ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "|");
+        ImGui::SameLine();
+
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem("New Scene", "Ctrl+N")) {
                 m_SceneSerializer->newScene();
@@ -298,14 +331,14 @@ void EditorUI::renderContextMenu() {
         ImGui::Separator();
 
         if (ImGui::MenuItem("Box Collider")) {
-            Entity entity = m_Scene.createEntity();
-            m_Scene.setEntityName(entity, "Collider");
-            m_Scene.setPosition(entity, worldPos);
-            auto& col = m_Scene.colliders[entity];
-            col.shape = ColliderComponent::Shape::Box;
-            col.size = { 64.f, 64.f };
-            m_SelectedEntity = entity;
-            m_ShowContextMenu = false;
+            //Entity entity = m_Scene.createEntity();
+            //m_Scene.setEntityName(entity, "Collider");
+            //m_Scene.setPosition(entity, worldPos);
+            //auto& col = m_Scene.colliders[entity];
+            //col.shape = ColliderComponent::Shape::Box;
+            //col.size = { 64.f, 64.f };
+            //m_SelectedEntity = entity;
+            //m_ShowContextMenu = false;
         }
 
         // Закрываем при клике вне меню

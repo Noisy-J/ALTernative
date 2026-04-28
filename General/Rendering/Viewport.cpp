@@ -131,31 +131,62 @@ void Viewport::renderDebugOverlays(Scene& scene, Entity selectedEntity, const sf
         }
     }
 
-    // Коллайдеры
+    // Коллайдеры — ИСПРАВЛЕННЫЙ БЛОК
     if (m_ShowColliders) {
         for (auto& [entity, collider] : scene.colliders) {
+            if (!collider.drawDebug) continue;  // Пропускаем если отладка выключена
+
             auto tfIt = scene.transforms.find(entity);
             if (tfIt == scene.transforms.end()) continue;
 
             auto& tf = tfIt->second;
+            sf::Vector2f worldPos = tf.Pos + collider.ColliderPosition;
 
-            if (collider.shape == ColliderComponent::Shape::Box) {
-                sf::RectangleShape box;
-                box.setPosition(tf.Pos + collider.offset - collider.size / 2.f);
-                box.setSize(collider.size);
-                box.setFillColor(sf::Color(0, 100, 255, 30));
-                box.setOutlineColor(sf::Color::Blue);
-                box.setOutlineThickness(1.f);
-                m_RenderTexture.draw(box);
-            }
-            else {
-                sf::CircleShape circle(collider.radius);
-                circle.setPosition(tf.Pos + collider.offset);
-                circle.setOrigin({ collider.radius, collider.radius });
-                circle.setFillColor(sf::Color(0, 100, 255, 30));
-                circle.setOutlineColor(sf::Color::Blue);
-                circle.setOutlineThickness(1.f);
-                m_RenderTexture.draw(circle);
+            // Box collider (основной прямоугольник)
+            sf::RectangleShape box;
+            box.setPosition(worldPos);
+            box.setOrigin(collider.ColliderSize / 2.0f);
+            box.setSize(collider.ColliderSize);
+            box.setRotation(collider.ColliderRotation);
+            box.setFillColor(sf::Color(0, 100, 255, 30));
+            box.setOutlineColor(collider.debugColor);
+            box.setOutlineThickness(2.f);
+            m_RenderTexture.draw(box);
+
+            // Радиус (пунктирная окружность)
+            sf::CircleShape radiusCircle(collider.ColliderRadius);
+            radiusCircle.setPosition(worldPos);
+            radiusCircle.setOrigin({ collider.ColliderRadius, collider.ColliderRadius });
+            radiusCircle.setFillColor(sf::Color::Transparent);
+            radiusCircle.setOutlineColor(sf::Color(255, 255, 0, 80));
+            radiusCircle.setOutlineThickness(1.f);
+            m_RenderTexture.draw(radiusCircle);
+
+            // Центральная точка
+            sf::CircleShape centerPoint(4.f);
+            centerPoint.setPosition(worldPos);
+            centerPoint.setOrigin({ 4.f, 4.f });
+            centerPoint.setFillColor(sf::Color::Red);
+            m_RenderTexture.draw(centerPoint);
+
+            // Подпись (статический/триггер)
+            if (collider.isTrigger || collider.isStatic) {
+                // Для подписей нужен sf::Text и шрифт, 
+                // поэтому просто меняем цвет для статики/триггера
+                sf::RectangleShape overlay;
+                overlay.setPosition(worldPos);
+                overlay.setOrigin(collider.ColliderSize / 2.0f);
+                overlay.setSize(collider.ColliderSize);
+                overlay.setFillColor(sf::Color::Transparent);
+
+                if (collider.isTrigger) {
+                    overlay.setOutlineColor(sf::Color::Yellow);
+                }
+                else if (collider.isStatic) {
+                    overlay.setOutlineColor(sf::Color::Cyan);
+                }
+                overlay.setOutlineThickness(1.f);
+                m_RenderTexture.draw(overlay);
             }
         }
     }

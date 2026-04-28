@@ -17,9 +17,11 @@
 #include "Serialization/SceneSerializer.hpp"
 #include "Build/BuildDialog.hpp"
 
+class Engine;
+
 class EditorUI {
 public:
-    EditorUI(sf::RenderWindow& window, Scene& scene, Viewport& viewport);
+    EditorUI(sf::RenderWindow& window, Scene& scene, Viewport& viewport, Engine& engine);
     ~EditorUI() = default;
 
     void update(Entity selectedEntity, float deltaTime);
@@ -46,6 +48,8 @@ private:
     std::unique_ptr<CreateEntityDialog> m_CreateEntityDialog;
     std::unique_ptr<FileDialog> m_FileDialog;
     std::unique_ptr<BuildDialog> m_BuildDialog;
+
+    Engine& m_Engine;
 
     Entity m_SelectedEntity{ INVALID_ENTITY };
     bool m_ShowContextMenu{ false };

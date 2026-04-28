@@ -10,6 +10,7 @@
 #include "Input/InputManager.hpp"
 #include "Editor/EditorUI.hpp"
 #include "Resources/TextureBrowser.hpp"
+#include "Scripting/ScriptRuntime.hpp"
 
 class Engine {
 public:
@@ -17,6 +18,13 @@ public:
     ~Engine() = default;
 
     void run();
+
+    bool isPlaying() const { return m_IsPlaying; }
+    bool isPaused() const { return m_IsPaused; }
+
+    void play();
+    void stop();
+    void pause();
 
 private:
     sf::RenderWindow m_Window;
@@ -31,6 +39,15 @@ private:
 
     std::shared_ptr<sf::Texture> m_DefaultTexture;
     Entity m_Player;
+
+    bool m_IsPlaying = false;
+    bool m_IsPaused = false;
+    bool m_BeginPlayExecuted = false;
+
+    void executeScriptEvents(bool beginPlayOnly);
+    bool parseScriptGraph(const std::string& json,
+        std::vector<Scripting::Node>& nodes,
+        std::vector<Scripting::Link>& links);
 
     void initializeWindow();
     void initializeImGui();

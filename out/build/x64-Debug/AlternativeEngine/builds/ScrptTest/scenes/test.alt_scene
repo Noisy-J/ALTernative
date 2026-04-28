@@ -1,0 +1,12 @@
+{
+  "version": "1.0",
+  "sceneName": "test",
+  "entities": [
+    {
+      "id": 0,
+      "name": "Sprite",
+      "transform": {"position":{"x":468.000,"y":347.000},"rotation":0.000,"scale":{"x":1.000,"y":1.000}},
+      "sprite": {"texturePath":"./assets/textures\\Autorecessive_ru.png","layer":0.000,"visible":true}
+    }
+  ]
+}

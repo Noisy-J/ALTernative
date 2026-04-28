@@ -313,9 +313,9 @@ std::string SceneSerializer::serializeVelocity(Entity entity) {
 std::string SceneSerializer::serializeCollider(Entity entity) {
     auto& col = m_Scene.colliders[entity];
     return SimpleJson::object({
-        {"shape", SimpleJson::number(col.shape == ColliderComponent::Shape::Box ? 0.f : 1.f)},
-        {"size", SimpleJson::vec2(col.size)},
-        {"radius", SimpleJson::number(col.radius)},
+        {"position", SimpleJson::vec2(col.ColliderPosition)},
+        {"size", SimpleJson::vec2(col.ColliderSize)},
+        {"radius", SimpleJson::number(col.ColliderRadius)},
         {"isTrigger", SimpleJson::boolean(col.isTrigger)},
         {"isStatic", SimpleJson::boolean(col.isStatic)}
         });

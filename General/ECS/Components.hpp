@@ -49,14 +49,20 @@ struct HealthComponent {
 };
 
 // Collider Component
+// Collider Component
+// Collider Component
 struct ColliderComponent {
-    enum class Shape { Box, Circle } shape{ Shape::Box };
-    sf::Vector2f size{ 32.f, 32.f };
-    float radius{ 16.f };
-    sf::Vector2f offset{ 0.f, 0.f };
-    bool isTrigger{ false };
-    bool isStatic{ false };
+    sf::Vector2f ColliderPosition{ 0.f, 0.f };  // Смещение относительно позиции сущности
+    sf::Angle ColliderRotation{ sf::degrees(0.f) };
+    float ColliderRadius{ 16.f };                // Радиус для круглых хитбоксов
+    sf::Vector2f ColliderSize{ 32.f, 32.f };     // Размер для Box хитбоксов
+
+    bool isTrigger{ false };                     // Триггер (не блокирует движение)
+    bool isStatic{ false };                      // Статический (не двигается)
+    bool drawDebug{ true };                      // Отрисовывать ли хитбокс
+    sf::Color debugColor{ sf::Color::Magenta };    // Цвет для отладки
 };
+
 
 // Name Component (имя сущности)
 struct NameComponent {

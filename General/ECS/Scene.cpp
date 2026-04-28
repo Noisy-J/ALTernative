@@ -196,3 +196,55 @@ std::string Scene::getEntityName(Entity entity) const {
     }
     return "Entity " + std::to_string(entity);
 }
+
+void Scene::setColliderPosition(Entity entity, const sf::Vector2f& pos) {
+    if (auto it = colliders.find(entity); it != colliders.end()) {
+        it->second.ColliderPosition = pos;
+    }
+}
+
+void Scene::setColliderSize(Entity entity, const sf::Vector2f& size) {
+    if (auto it = colliders.find(entity); it != colliders.end()) {
+        it->second.ColliderSize = size;
+    }
+}
+
+void Scene::setColliderRotation(Entity entity, sf::Angle rot) {
+    if (auto it = colliders.find(entity); it != colliders.end()) {
+        it->second.ColliderRotation = rot;
+    }
+}
+
+sf::Vector2f Scene::getColliderPosition(Entity entity) const {
+    if (auto it = colliders.find(entity); it != colliders.end()) {
+        return it->second.ColliderPosition;
+    }
+    return { 0.f, 0.f };
+}
+
+sf::Vector2f Scene::getColliderSize(Entity entity) const {
+    if (auto it = colliders.find(entity); it != colliders.end()) {
+        return it->second.ColliderSize;
+    }
+    return { 32.f, 32.f };
+}
+
+/*sf::Angle Scene::getColliderRotation(Entity entity) const {
+    if (auto it = colliders.find(entity); it != colliders.end()) {
+        return it->second.ColliderRotation;
+    }
+    return sf::degrees(0.f);
+}*/
+
+void Scene::setColliderRadius(Entity entity, float radius) {
+    if (auto it = colliders.find(entity); it != colliders.end()) {
+        it->second.ColliderRadius = radius;
+    }
+}
+
+float Scene::getColliderRadius(Entity entity) const {
+    if (auto it = colliders.find(entity); it != colliders.end()) {
+        return it->second.ColliderRadius;
+    }
+    return 16.f;
+}

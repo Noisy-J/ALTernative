@@ -8,6 +8,7 @@
 #include <algorithm>
 #include "ECS/Scene.hpp"
 #include "Scripting/NodeSystem.hpp"
+#include "Scripting/ScriptRuntime.hpp"
 
 class ScriptEditorPanel {
 public:
@@ -17,6 +18,12 @@ public:
     void render();
     void openForEntity(Entity entity);
     bool isOpen() const { return m_IsOpen; }
+
+    void executeGraph();
+    void executeNodeChain(Scripting::Node& node);
+
+    void saveGraph();
+    void loadGraph();
 
 private:
     Scene& m_Scene;
@@ -35,6 +42,7 @@ private:
 
     // Взаимодействие
     int m_SelectedNodeId{ -1 };
+    int m_EditingNodeId{ -1 };
     int m_HoveredNodeId{ -1 };
     int m_HoveredPinId{ -1 };
     int m_HoveredPinNodeId{ -1 };
@@ -45,10 +53,10 @@ private:
     int m_DragStartNodeId{ -1 };
     int m_DragStartPinId{ -1 };
     bool m_DragStartIsOutput{ false };
-    ImVec2 m_DragEndPos{ 0, 0 };
 
-    enum class NodeAction { None, Select, Move, Connect };
-    NodeAction m_CurrentAction{ NodeAction::None };
+    // Поиск
+    char m_SearchBuffer[128] = "";
+    bool m_ShowSearchResults{ false };
 
     void renderToolbar();
     void renderCanvas();
@@ -56,22 +64,21 @@ private:
     void renderLinks();
     void renderContextMenu();
     void renderNodeProperties();
-    void renderDraggingLink(ImDrawList* drawList);
 
     void addNode(const std::string& type, ImVec2 canvasPos);
     void deleteNode(int nodeId);
     void createLink(int startNodeId, int startPinId, int endNodeId, int endPinId);
     void removeLink(int linkId);
 
-    void executeGraph();
-    void saveGraph();
-    void loadGraph();
-
-    // Координаты (используют m_CanvasOrigin)
+    // Координаты
     ImVec2 screenToCanvas(const ImVec2& screenPos) const;
     ImVec2 canvasToScreen(const ImVec2& canvasPos) const;
     ImVec2 getPinScreenPos(int nodeId, int pinId, bool isInput) const;
 
     ImU32 getPinColor(Scripting::PinType type) const;
     const char* getPinTypeName(Scripting::PinType type) const;
+
+    std::string getNodeIcon(const std::string& type) const;
+
+    std::string getNodeDescription(const std::string& type) const;
 };

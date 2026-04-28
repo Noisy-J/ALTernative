@@ -71,7 +71,7 @@ private:
     sf::Vector2f m_ScreenSize{ 0.f, 0.f };
 
     bool m_ShowGrid{ true };
-    bool m_ShowBounds{ true };
+    bool m_ShowBounds{ 0 };
     bool m_ShowColliders{ false };
     bool m_MouseInside{ false };
     float m_GridSize{ 100.f };
