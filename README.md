@@ -349,5 +349,5 @@ cd build/AlternativeEngine/Release
 
 <p align="center">
   <b>Alternative Engine</b> — создан с ❤️ для курса ОПД<br/>
-  <sub>© 2024 Noisy-J & egor417</sub>
+  <sub>© 2026 Noisy-J & egor417</sub>
 </p>
